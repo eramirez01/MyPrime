@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.erz.myprimes.R;
 
@@ -20,8 +21,8 @@ public class MyPrimeAdapter extends BaseAdapter {
         this.data = new int[size];
     }
 
-    static class ViewHolder {
-        TextView name;
+    public static class ViewHolder {
+        public TextView name;
     }
 
     @Override
@@ -65,14 +66,17 @@ public class MyPrimeAdapter extends BaseAdapter {
     }
 
     public void setData(int size) {
-        this.data = new int[size];
+        try {
+            this.data = new int[size];
+        } catch (OutOfMemoryError e) {
+            System.gc();
+            this.data = new int[0];
+            Toast.makeText(context, "Out of memory, try again", Toast.LENGTH_SHORT).show();
+        }
         notifyDataSetChanged();
     }
 
     public void setItemColor(int i, int color) {
-        if (i < data.length) {
-            data[i] = color;
-            notifyDataSetChanged();
-        }
+        data[i] = color;
     }
 }

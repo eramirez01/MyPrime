@@ -1,6 +1,7 @@
 package com.erz.myprimes.activities;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
@@ -24,12 +25,13 @@ public class MainActivity extends ActionBarActivity implements BackgroundTaskLis
     MyPrimeAdapter adapter;
     BackgroundTask task;
     EditText number;
+    GridView gridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        GridView gridView = (GridView) findViewById(R.id.grid);
+        gridView = (GridView) findViewById(R.id.grid);
         adapter = new MyPrimeAdapter(this, 0);
         gridView.setAdapter(adapter);
         gridView.setFastScrollEnabled(true);
@@ -77,7 +79,20 @@ public class MainActivity extends ActionBarActivity implements BackgroundTaskLis
 
     @Override
     public void progress(int position, int color) {
-        adapter.setItemColor(position-1, color);
+        adapter.setItemColor(position, color);
+        if (position < adapter.getCount()
+                && position >= gridView.getFirstVisiblePosition()
+                && position <= gridView.getLastVisiblePosition()) {
+
+            View v = gridView.getChildAt(position);
+            if (v == null) return;
+
+            MyPrimeAdapter.ViewHolder holder = (MyPrimeAdapter.ViewHolder) v.getTag();
+            if (holder == null) return;
+
+            holder.name.setTextColor(Color.WHITE);
+            holder.name.setBackgroundResource(color);
+        }
     }
 
     @Override

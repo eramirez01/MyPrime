@@ -15,8 +15,22 @@ public class BackgroundTask extends AsyncTask<Object, BackgroundTask.BackgroundT
         this.listener = listener;
     }
 
+    public void run(Object... params) {
+        try {
+            this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
+        } catch(RejectedExecutionException e) {
+            listener.progress(0, 0);
+        }
+    }
+
+    @Override
+    protected final void onPreExecute() {
+        listener.begin();
+    }
+
     //http://www.algolist.net/Algorithms/Number_theoretic/Sieve_of_Eratosthenes
-    protected Result doExecute(Object... params) {
+    @Override
+    protected final Result doInBackground(Object... params) {
         Result result = new Result();
         result.setStart(System.currentTimeMillis());
         int top = 0, i;
@@ -24,7 +38,16 @@ public class BackgroundTask extends AsyncTask<Object, BackgroundTask.BackgroundT
             top = (Integer) params[0];
         }
 
-        boolean[] isPrime = new boolean[top + 1];
+        boolean[] isPrime;
+        try {
+            isPrime = new boolean[top + 1];
+        } catch (OutOfMemoryError e) {
+            System.gc();
+            result.setCount(0);
+            result.setEnd(System.currentTimeMillis());
+            return result;
+        }
+
         for (i = 2; i <= top; i++) {
             isPrime[i] = true;
         }
@@ -40,7 +63,7 @@ public class BackgroundTask extends AsyncTask<Object, BackgroundTask.BackgroundT
         int primes = 0;
         for (i = 2; i <= top; i++) {
             if (isPrime[i]) {
-                progress(i, R.drawable.green_bg);
+                progress(i-1, R.drawable.green_bg);
                 primes++;
             }
         }
@@ -48,24 +71,6 @@ public class BackgroundTask extends AsyncTask<Object, BackgroundTask.BackgroundT
         result.setCount(primes);
         result.setEnd(System.currentTimeMillis());
         return result;
-    }
-
-    public void run(Object... params) {
-        try {
-            this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
-        } catch(RejectedExecutionException e) {
-            listener.progress(0, 0);
-        }
-    }
-
-    @Override
-    protected final void onPreExecute() {
-        listener.begin();
-    }
-
-    @Override
-    protected final Result doInBackground(Object... params) {
-        return doExecute(params);
     }
 
     @Override
