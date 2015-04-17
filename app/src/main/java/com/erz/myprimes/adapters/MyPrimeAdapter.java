@@ -77,6 +77,8 @@ public class MyPrimeAdapter extends BaseAdapter {
     }
 
     public void setItemColor(int i, int color) {
-        data[i] = color;
+        if (i < data.length) {
+            data[i] = color;
+        }
     }
 }
