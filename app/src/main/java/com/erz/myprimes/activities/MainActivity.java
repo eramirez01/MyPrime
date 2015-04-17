@@ -97,6 +97,7 @@ public class MainActivity extends ActionBarActivity implements BackgroundTaskLis
 
     @Override
     public void complete(Result result) {
+        adapter.notifyDataSetChanged();
         FragmentManager fm = getSupportFragmentManager();
         ResultDialog resultDialog = (ResultDialog) fm.findFragmentByTag("resultDialog");
         if (resultDialog == null) {
